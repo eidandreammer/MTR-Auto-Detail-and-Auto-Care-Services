@@ -5,6 +5,11 @@ const PHONE_DISPLAY = '(973) 277-0374'
 const PHONE_LINK = 'tel:+19732770374'
 const ADDRESS = '133 River Dr, Garfield, NJ 07026'
 const HOURS_DISPLAY = 'Mon-Fri 8:30am-6pm; Sat 9am-4pm'
+const BUSINESS_HOURS = [
+  { days: 'Mon-Fri', hours: '8:30am-6pm' },
+  { days: 'Saturday', hours: '9am-4pm' },
+  { days: 'Sunday', hours: 'Closed' },
+]
 const MAPS_URL =
   'https://www.google.com/maps/place/MTR+Auto+Detail+and+Auto+Care+Services/@40.8640673,-74.107533,17z/data=!3m1!4b1!4m6!3m5!1s0x89c2f91d34b7b6bb:0x27692c57dba7643c!8m2!3d40.8640673!4d-74.107533!16s%2Fg%2F11qnlxn9qt?entry=ttu'
 
@@ -261,8 +266,16 @@ function App() {
                 </div>
                 <div>
                   <dt>Hours</dt>
-                  <dd>{HOURS_DISPLAY}</dd>
-                  <dd>Sunday closed</dd>
+                  <dd>
+                    <div className="hours-list" aria-label="Business hours">
+                      {BUSINESS_HOURS.map((item) => (
+                        <div className="hours-row" key={item.days}>
+                          <span>{item.days}</span>
+                          <strong>{item.hours}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </dd>
                 </div>
                 <div>
                   <dt>Phone</dt>
