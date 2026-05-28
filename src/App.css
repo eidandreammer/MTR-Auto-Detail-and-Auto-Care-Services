@@ -183,7 +183,7 @@
   z-index: 2;
   width: min(100%, 1160px);
   margin: 0 auto;
-  text-align: center;
+  text-align: left;
 }
 
 .eyebrow,
@@ -204,9 +204,9 @@
 .hero-title {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 9px 18px;
-  margin: 28px auto 24px;
+  margin: 28px 0 24px;
   color: #ffffff;
   font-size: 76px;
   font-weight: 900;
@@ -221,7 +221,7 @@
 
 .hero-copy {
   width: min(100%, 720px);
-  margin: 0 auto;
+  margin: 0;
   color: rgba(255, 255, 255, 0.9);
   font-size: 21px;
   line-height: 1.55;
@@ -231,7 +231,7 @@
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
   margin-top: 34px;
 }
@@ -240,9 +240,11 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   width: min(100%, 920px);
-  margin: 58px auto 0;
+  margin: 58px 0 0;
   border: 1px solid rgba(26, 26, 26, 0.16);
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.76);
+  overflow: hidden;
   text-align: left;
 }
 

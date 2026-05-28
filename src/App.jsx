@@ -48,19 +48,19 @@ const services = [
   },
 ]
 
-const merchItems = [
+const shopHighlights = [
   {
-    name: 'Technical Work Shirt',
-    note: 'Structured cotton blend',
-    image: asset('shirt.jpg'),
-    alt: 'Minimal black technical shirt displayed on a white background',
+    name: 'Repair Estimates',
+    note: 'Clear findings, practical options, and no-pressure recommendations',
+    image: asset('mechanic.jpg'),
+    alt: 'Mechanic working inside a vehicle engine bay',
   },
 
   {
-    name: 'Detail Kit',
-    note: 'Microfiber and finish-care essentials',
-    image: asset('detail-kit.jpg'),
-    alt: 'Detailing tool polishing a glossy vehicle surface',
+    name: 'Preventive Maintenance',
+    note: 'Oil service, filters, fluids, brakes, and scheduled inspections',
+    image: asset('maintenance.jpg'),
+    alt: 'Vehicle lifted for maintenance in a modern auto service bay',
   },
 ]
 
@@ -235,12 +235,12 @@ function App() {
 
         <section className="section merch-section" id="store">
           <div className="section-header" data-reveal>
-            <p className="section-kicker">MTR Goods</p>
-            <h2>Limited shop identity pieces, coming soon.</h2>
+            <p className="section-kicker">Shop Support</p>
+            <h2>Helpful service guidance before the repair begins.</h2>
           </div>
 
           <div className="merch-grid" data-reveal>
-            {merchItems.map((item) => (
+            {shopHighlights.map((item) => (
               <article className="merch-card" key={item.name}>
                 <div className="merch-media">
                   <img src={item.image} alt={item.alt} loading="lazy" />
