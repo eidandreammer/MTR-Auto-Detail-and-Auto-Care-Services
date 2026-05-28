@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import './App.css'
 
-const PHONE_DISPLAY = '(973) 246-5597'
-const PHONE_LINK = 'tel:+19732465597'
-const EMAIL = 'info@mtr-autoservices.com'
-const BOOKING_TARGET = '#contact'
+const PHONE_DISPLAY = '(973) 277-0374'
+const PHONE_LINK = 'tel:+19732770374'
+const ADDRESS = '133 River Dr, Garfield, NJ 07026'
+const HOURS_DISPLAY = 'Mon-Fri 8:30am-6pm; Sat 9am-4pm'
+const MAPS_URL =
+  'https://www.google.com/maps/place/MTR+Auto+Detail+and+Auto+Care+Services/@40.8640673,-74.107533,17z/data=!3m1!4b1!4m6!3m5!1s0x89c2f91d34b7b6bb:0x27692c57dba7643c!8m2!3d40.8640673!4d-74.107533!16s%2Fg%2F11qnlxn9qt?entry=ttu'
 
-const asset = (fileName) => `/images/${fileName}`
+const asset = (fileName) => `${import.meta.env.BASE_URL}images/${fileName}`
 
 const services = [
   {
@@ -48,12 +50,7 @@ const merchItems = [
     image: asset('shirt.jpg'),
     alt: 'Minimal black technical shirt displayed on a white background',
   },
-  {
-    name: 'Shop Cap',
-    note: 'Low-profile daily driver fit',
-    image: asset('cap.jpg'),
-    alt: 'Minimal cap photographed against a clean background',
-  },
+
   {
     name: 'Detail Kit',
     note: 'Microfiber and finish-care essentials',
@@ -99,53 +96,22 @@ function App() {
     }
   }, [])
 
-  const handleServiceRequest = (event) => {
-    event.preventDefault()
-
-    const form = event.currentTarget
-    const data = new FormData(form)
-    const name = data.get('fullName') || 'Website visitor'
-    const subject = `Service request from ${name}`
-    const body = [
-      `Full name: ${data.get('fullName') || ''}`,
-      `Email: ${data.get('email') || ''}`,
-      `Phone: ${data.get('phone') || ''}`,
-      `Preferred service: ${data.get('service') || ''}`,
-      '',
-      'Message / vehicle info:',
-      data.get('message') || '',
-    ].join('\n')
-
-    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    form.reset()
-  }
-
   return (
     <div className="site-shell">
-      <header className="site-header" aria-label="Primary navigation">
-        <div className="header-inner">
-          <a className="brand" href="#home" aria-label="MTR Auto Services home">
-            <span className="brand-mark">MTR</span>
-            <span className="brand-copy">
-              Auto Detail
-              <span>Auto Care Services</span>
-            </span>
-          </a>
-
-          <nav className="nav-links" aria-label="Site sections">
-            <a href="#home">Home</a>
-            <a href="#services">Services</a>
-            <a href="#about">About</a>
-            <a href="#visit">Visit Us</a>
-            <a href="#contact">Contact</a>
-          </nav>
-
-          
-        </div>
-      </header>
-
       <main>
         <section className="hero-section" id="home">
+          <header className="site-header" aria-label="Primary navigation">
+            <div className="header-inner">
+              <nav className="nav-links" aria-label="Site sections">
+                <a href="#home">Home</a>
+                <a href="#services">Services</a>
+                <a href="#about">About</a>
+                <a href="#visit">Visit Us</a>
+                <a href="#contact">Contact</a>
+              </nav>
+            </div>
+          </header>
+
           <img
             className="hero-bg"
             src={asset('hero-bay.jpg')}
@@ -160,11 +126,11 @@ function App() {
             <h1 className="hero-title" data-reveal>
               <span>DIAGNOSE</span>
               <span className="hero-separator" aria-hidden="true">
-                •
+                &bull;
               </span>
               <span>REPAIR</span>
               <span className="hero-separator" aria-hidden="true">
-                •
+                &bull;
               </span>
               <span>PERFORMANCE</span>
             </h1>
@@ -183,15 +149,15 @@ function App() {
             <div className="hero-proof" data-reveal aria-label="Shop highlights">
               <div>
                 <span>Address</span>
-                <strong>133 River Dr, Garfield</strong>
+                <strong>{ADDRESS}</strong>
               </div>
               <div>
                 <span>Hours</span>
-                <strong>Mon-Fri 8am-6pm</strong>
+                <strong>{HOURS_DISPLAY}</strong>
               </div>
               <div>
                 <span>Service Scope</span>
-                <strong>Detailing, diagnostics, brakes</strong>
+                <strong>Detailing, diagnostics, brakes, oil changes</strong>
               </div>
             </div>
           </div>
@@ -221,10 +187,11 @@ function App() {
             <p>
               MTR handles the complete care cycle: routine factory maintenance,
               computer diagnostics, brake service, general mechanical repair,
-              full detailing, headlight restoration, hand wax, decal removal,
-              scratch removal, and finish correction. Every visit is built
-              around clear findings, practical options, and work that respects
-              the vehicle.
+              oil changes, full auto detail, interior and exterior care,
+              headlight restoration, hand wax, window tint removal, decal
+              removal, scratch removal, and finish correction. Every visit is
+              built around clear findings, practical options, and work that
+              respects the vehicle.
             </p>
           
           </div>
@@ -282,7 +249,54 @@ function App() {
           </div>
         </section>
 
-       
+        <section className="section contact-section" id="visit">
+          <div className="contact-layout" data-reveal>
+            <div className="visit-panel">
+              <p className="section-kicker">Visit Us</p>
+              <h2>MTR Auto Detail and Auto Care Services.</h2>
+              <dl className="visit-details">
+                <div>
+                  <dt>Address</dt>
+                  <dd>{ADDRESS}</dd>
+                </div>
+                <div>
+                  <dt>Hours</dt>
+                  <dd>{HOURS_DISPLAY}</dd>
+                  <dd>Sunday closed</dd>
+                </div>
+                <div>
+                  <dt>Phone</dt>
+                  <dd>
+                    <a href={PHONE_LINK}>{PHONE_DISPLAY}</a>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="form-panel" id="contact">
+              <p className="section-kicker">Contact</p>
+              <h2>Call or open the local listing before you come in.</h2>
+              <p className="contact-copy">
+                The shop is listed as an auto detailing service, auto repair
+                shop, and repair service at 133 River Dr in Garfield.
+              </p>
+              <div className="contact-actions">
+                <a className="button button-primary" href={PHONE_LINK}>
+                  Call {PHONE_DISPLAY}
+                </a>
+                <a
+                  className="button button-secondary"
+                  href={MAPS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open Maps
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
 
       <footer className="site-footer">
@@ -297,7 +311,10 @@ function App() {
             <a href="#visit">Visit Us</a>
             <a href="#contact">Contact</a>
           </nav>
-          <p>133 River Dr, Garfield, NJ 07026</p>
+          <p>{ADDRESS}</p>
+          <p>
+            <a href={PHONE_LINK}>{PHONE_DISPLAY}</a> | {HOURS_DISPLAY}
+          </p>
           <p>
             No mobile information will be shared with third parties or
             affiliates for marketing or promotional purposes. Text messaging
