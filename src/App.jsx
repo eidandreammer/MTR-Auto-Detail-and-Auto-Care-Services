@@ -1,5 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+import BlurText from './components/BlurText.jsx'
+import StaggeredMenu from './components/StaggeredMenu.jsx'
 
 const PHONE_DISPLAY = '(973) 277-0374'
 const PHONE_LINK = 'tel:+19732770374'
@@ -12,8 +14,23 @@ const BUSINESS_HOURS = [
 ]
 const MAPS_URL =
   'https://www.google.com/maps/place/MTR+Auto+Detail+and+Auto+Care+Services/@40.8640673,-74.107533,17z/data=!3m1!4b1!4m6!3m5!1s0x89c2f91d34b7b6bb:0x27692c57dba7643c!8m2!3d40.8640673!4d-74.107533!16s%2Fg%2F11qnlxn9qt?entry=ttu'
+const MOBILE_MENU_QUERY = '(max-width: 760px)'
+const LOGO_URL = `${import.meta.env.BASE_URL}favicon.ico`
+const SOCIAL_LINKS = [
+  { label: 'Instagram', link: 'https://www.instagram.com/' },
+  { label: 'Facebook', link: 'https://www.facebook.com/' },
+  { label: 'TikTok', link: 'https://www.tiktok.com/' },
+]
 
 const asset = (fileName) => `${import.meta.env.BASE_URL}images/${fileName}`
+
+const menuItems = [
+  { label: 'Home', ariaLabel: 'Go to the home section', link: '#home' },
+  { label: 'Services', ariaLabel: 'View our services', link: '#services' },
+  { label: 'About', ariaLabel: 'Learn about MTR', link: '#about' },
+  { label: 'Visit Us', ariaLabel: 'View shop information', link: '#visit' },
+  { label: 'Contact', ariaLabel: 'View contact options', link: '#contact' },
+]
 
 const services = [
   {
@@ -64,7 +81,60 @@ const shopHighlights = [
   },
 ]
 
+const AnimatedText = ({ delay = 35, stepDuration = 0.28, ...props }) => (
+  <BlurText delay={delay} stepDuration={stepDuration} {...props} />
+)
+
+function SocialIcon({ name }) {
+  if (name === 'Instagram') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.4" cy="6.7" r="1" className="social-icon-fill" />
+      </svg>
+    )
+  }
+
+  if (name === 'Facebook') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          className="social-icon-fill"
+          d="M13.8 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.5 1.6-1.5H17V3.9c-.7-.1-1.5-.2-2.3-.2-2.3 0-3.9 1.4-3.9 4V10H8.2v3h2.6v8h3Z"
+        />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        className="social-icon-fill"
+        d="M15 3c.3 2.1 1.5 3.4 3.6 3.6v3.1c-1.3 0-2.5-.4-3.6-1.1v5.8a6 6 0 1 1-5.2-6V12a2.5 2.5 0 1 0 1.7 2.4V3H15Z"
+      />
+    </svg>
+  )
+}
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query)
+    const updateMatch = () => setMatches(mediaQuery.matches)
+
+    updateMatch()
+    mediaQuery.addEventListener('change', updateMatch)
+    return () => mediaQuery.removeEventListener('change', updateMatch)
+  }, [query])
+
+  return matches
+}
+
 function App() {
+  const showMobileMenu = useMediaQuery(MOBILE_MENU_QUERY)
+
   useEffect(() => {
     const revealItems = document.querySelectorAll('[data-reveal]')
 
@@ -103,66 +173,152 @@ function App() {
 
   return (
     <div className="site-shell">
+      <div className="static-background" aria-hidden="true">
+        <img
+          src={asset('background static.png')}
+          alt=""
+          fetchPriority="high"
+        />
+      </div>
+
+      {showMobileMenu && (
+        <StaggeredMenu
+          position="right"
+          items={menuItems}
+          displaySocials={false}
+          displayItemNumbering
+          menuButtonColor="#1a1a1a"
+          openMenuButtonColor="#1a1a1a"
+          changeMenuColorOnOpen
+          colors={['#1a1a1a', '#d5001c']}
+          logoUrl={LOGO_URL}
+          accentColor="#d5001c"
+          isFixed
+        />
+      )}
+
       <main>
-        <section className="hero-section" id="home">
+        <section
+          className="hero-section"
+          id="home"
+          style={{
+            '--hero-background-image': `url("${asset('MTR hero section.jpg')}")`,
+          }}
+        >
           <header className="site-header" aria-label="Primary navigation">
             <div className="header-inner">
+              <a className="header-brand" href="#home" aria-label="MTR home">
+                <img
+                  className="header-logo"
+                  src={asset('footer-logo.png')}
+                  alt="MTR Auto Detail and Auto Care Services"
+                />
+              </a>
               <nav className="nav-links" aria-label="Site sections">
-                <a href="#home">Home</a>
-                <a href="#services">Services</a>
-                <a href="#about">About</a>
-                <a href="#visit">Visit Us</a>
-                <a href="#contact">Contact</a>
+                <AnimatedText
+                  as="a"
+                  className="nav-link-active"
+                  href="#home"
+                  text="Home"
+                  delay={70}
+                />
+                <AnimatedText
+                  as="a"
+                  href="#services"
+                  text="Services"
+                  delay={70}
+                />
+                <AnimatedText as="a" href="#about" text="About" delay={70} />
+                <AnimatedText as="a" href="#visit" text="Visit Us" delay={70} />
+                <AnimatedText
+                  as="a"
+                  href="#contact"
+                  text="Contact"
+                  delay={70}
+                />
               </nav>
+              <a className="header-phone" href={PHONE_LINK}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 16.4v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 3.7 2 2 0 0 1 3.1 1.5h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L7.1 9.4a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z" />
+                </svg>
+                <span>{PHONE_DISPLAY}</span>
+              </a>
             </div>
           </header>
 
-          <img
-            className="hero-bg"
-            src={asset('hero-bay.jpg')}
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-          />
           <div className="hero-content">
-            <p className="eyebrow" data-reveal>
-              Garfield, NJ precision auto care
-            </p>
-            <h1 className="hero-title" data-reveal>
-              <span>DIAGNOSE</span>
-              <span className="hero-separator" aria-hidden="true">
-                &bull;
-              </span>
-              <span>REPAIR</span>
-              <span className="hero-separator" aria-hidden="true">
-                &bull;
-              </span>
-              <span>PERFORMANCE</span>
-            </h1>
-            <p className="hero-copy" data-reveal>
-              Disciplined diagnostics, transparent recommendations, and
-              meticulous auto care for drivers who expect the work to be
-              explained clearly and completed correctly.
-            </p>
-            <div className="hero-actions" data-reveal>
+            <AnimatedText
+              className="eyebrow"
+              text="Garfield, NJ precision auto care"
+              delay={80}
+            />
+            <AnimatedText
+              as="h1"
+              className="hero-title"
+              text={'DIAGNOSE \u2022 REPAIR \u2022 PERFORMANCE'}
+              delay={140}
+              animateBy="words"
+              direction="top"
+              aria-label="Diagnose, repair, performance"
+            />
+            <AnimatedText
+              className="hero-copy"
+              text="Disciplined diagnostics, transparent recommendations, and meticulous auto care for drivers who expect the work to be explained clearly and completed correctly."
+              delay={45}
+            />
+            <div className="hero-actions">
              
-              <a className="button button-secondary button-large" href={PHONE_LINK}>
-                Call {PHONE_DISPLAY}
-              </a>
+              <AnimatedText
+                as="a"
+                className="button button-secondary button-large"
+                href={PHONE_LINK}
+                text={`Call ${PHONE_DISPLAY}`}
+                delay={80}
+              />
             </div>
 
-            <div className="hero-proof" data-reveal aria-label="Shop highlights">
+            <div className="hero-proof" aria-label="Shop highlights">
               <div>
-                <span>Address</span>
-                <strong>{ADDRESS}</strong>
+                <AnimatedText
+                  as="span"
+                  className="hero-proof-label"
+                  text="Address"
+                  delay={60}
+                />
+                <AnimatedText
+                  as="strong"
+                  className="hero-proof-value"
+                  text={ADDRESS}
+                  delay={45}
+                />
               </div>
               <div>
-                <span>Hours</span>
-                <strong>{HOURS_DISPLAY}</strong>
+                <AnimatedText
+                  as="span"
+                  className="hero-proof-label"
+                  text="Hours"
+                  delay={60}
+                />
+                <AnimatedText
+                  as="strong"
+                  className="hero-proof-value"
+                  text={HOURS_DISPLAY}
+                  delay={45}
+                />
               </div>
               <div>
-                <span>Service Scope</span>
-                <strong>Detailing, diagnostics, brakes, oil changes</strong>
+                <AnimatedText
+                  as="span"
+                  className="hero-proof-label"
+                  text="Service Scope"
+                  delay={60}
+                />
+                <AnimatedText
+                  as="strong"
+                  className="hero-proof-value"
+                  text="Detailing, diagnostics, brakes, oil changes"
+                  delay={45}
+                />
               </div>
             </div>
           </div>
@@ -170,8 +326,15 @@ function App() {
 
         <section className="section services-section" id="services">
           <div className="section-header" data-reveal>
-            <p className="section-kicker">Our Services</p>
-            <h2>Clinical process. Mechanical confidence.</h2>
+            <AnimatedText
+              as="p"
+              className="section-kicker"
+              text="Our Services"
+            />
+            <AnimatedText
+              as="h2"
+              text="Clinical process. Mechanical confidence."
+            />
           </div>
 
           <div className="services-grid" data-reveal>
@@ -181,23 +344,19 @@ function App() {
                   <img src={service.image} alt={service.alt} loading="lazy" />
                 </div>
                 <div className="service-content">
-                  <h3>{service.title}</h3>
-                  <p>{service.meta}</p>
+                  <AnimatedText as="h3" text={service.title} />
+                  <AnimatedText as="p" text={service.meta} delay={25} />
                 </div>
               </article>
             ))}
           </div>
 
           <div className="service-copy" data-reveal>
-            <p>
-              MTR handles the complete care cycle: routine factory maintenance,
-              computer diagnostics, brake service, general mechanical repair,
-              oil changes, full auto detail, interior and exterior care,
-              headlight restoration, hand wax, window tint removal, decal
-              removal, scratch removal, and finish correction. Every visit is
-              built around clear findings, practical options, and work that
-              respects the vehicle.
-            </p>
+            <AnimatedText
+              as="p"
+              text="MTR handles the complete care cycle: routine factory maintenance, computer diagnostics, brake service, general mechanical repair, oil changes, full auto detail, interior and exterior care, headlight restoration, hand wax, window tint removal, decal removal, scratch removal, and finish correction. Every visit is built around clear findings, practical options, and work that respects the vehicle."
+              delay={20}
+            />
           
           </div>
         </section>
@@ -205,21 +364,25 @@ function App() {
         <section className="section about-section" id="about">
           <div className="about-layout">
             <div className="about-copy" data-reveal>
-              <p className="section-kicker">About the Company</p>
-              <h2>Hands-on auto care with a builder's attention to detail.</h2>
-              <p>
-                MTR Auto Detail and Auto Care Services was shaped around a
-                simple standard: inspect thoroughly, explain the work plainly,
-                and treat each vehicle like a project worth doing right. The
-                shop blends mechanical repair and finish care, so daily drivers
-                and enthusiast cars can leave sharper, safer, and better sorted.
-              </p>
-              <p>
-                That labor-of-love philosophy shows up in the small decisions:
-                checking the cause before replacing parts, protecting clean
-                surfaces during service, and giving customers a direct path
-                from first concern to confirmed repair.
-              </p>
+              <AnimatedText
+                as="p"
+                className="section-kicker"
+                text="About the Company"
+              />
+              <AnimatedText
+                as="h2"
+                text="Hands-on auto care with a builder's attention to detail."
+              />
+              <AnimatedText
+                as="p"
+                text="MTR Auto Detail and Auto Care Services was shaped around a simple standard: inspect thoroughly, explain the work plainly, and treat each vehicle like a project worth doing right. The shop blends mechanical repair and finish care, so daily drivers and enthusiast cars can leave sharper, safer, and better sorted."
+                delay={20}
+              />
+              <AnimatedText
+                as="p"
+                text="That labor-of-love philosophy shows up in the small decisions: checking the cause before replacing parts, protecting clean surfaces during service, and giving customers a direct path from first concern to confirmed repair."
+                delay={20}
+              />
              
             </div>
 
@@ -235,8 +398,15 @@ function App() {
 
         <section className="section merch-section" id="store">
           <div className="section-header" data-reveal>
-            <p className="section-kicker">Shop Support</p>
-            <h2>Helpful service guidance before the repair begins.</h2>
+            <AnimatedText
+              as="p"
+              className="section-kicker"
+              text="Shop Support"
+            />
+            <AnimatedText
+              as="h2"
+              text="Helpful service guidance before the repair begins."
+            />
           </div>
 
           <div className="merch-grid" data-reveal>
@@ -246,8 +416,8 @@ function App() {
                   <img src={item.image} alt={item.alt} loading="lazy" />
                 </div>
                 <div className="merch-content">
-                  <h3>{item.name}</h3>
-                  <p>{item.note}</p>
+                  <AnimatedText as="h3" text={item.name} />
+                  <AnimatedText as="p" text={item.note} delay={25} />
                 </div>
               </article>
             ))}
@@ -257,54 +427,81 @@ function App() {
         <section className="section contact-section" id="visit">
           <div className="contact-layout" data-reveal>
             <div className="visit-panel">
-              <p className="section-kicker">Visit Us</p>
-              <h2>MTR Auto Detail and Auto Care Services.</h2>
+              <AnimatedText
+                as="p"
+                className="section-kicker"
+                text="Visit Us"
+              />
+              <AnimatedText
+                as="h2"
+                text="MTR Auto Detail and Auto Care Services."
+              />
               <dl className="visit-details">
                 <div>
-                  <dt>Address</dt>
-                  <dd>{ADDRESS}</dd>
+                  <AnimatedText as="dt" text="Address" />
+                  <AnimatedText as="dd" text={ADDRESS} />
                 </div>
                 <div>
-                  <dt>Hours</dt>
+                  <AnimatedText as="dt" text="Hours" />
                   <dd>
                     <div className="hours-list" aria-label="Business hours">
                       {BUSINESS_HOURS.map((item) => (
                         <div className="hours-row" key={item.days}>
-                          <span>{item.days}</span>
-                          <strong>{item.hours}</strong>
+                          <AnimatedText as="span" text={item.days} delay={25} />
+                          <AnimatedText
+                            as="strong"
+                            text={item.hours}
+                            delay={25}
+                          />
                         </div>
                       ))}
                     </div>
                   </dd>
                 </div>
                 <div>
-                  <dt>Phone</dt>
+                  <AnimatedText as="dt" text="Phone" />
                   <dd>
-                    <a href={PHONE_LINK}>{PHONE_DISPLAY}</a>
+                    <AnimatedText
+                      as="a"
+                      href={PHONE_LINK}
+                      text={PHONE_DISPLAY}
+                    />
                   </dd>
                 </div>
               </dl>
             </div>
 
             <div className="form-panel" id="contact">
-              <p className="section-kicker">Contact</p>
-              <h2>Call or open the local listing before you come in.</h2>
-              <p className="contact-copy">
-                The shop is listed as an auto detailing service, auto repair
-                shop, and repair service at 133 River Dr in Garfield.
-              </p>
+              <AnimatedText
+                as="p"
+                className="section-kicker"
+                text="Contact"
+              />
+              <AnimatedText
+                as="h2"
+                text="Call or open the local listing before you come in."
+              />
+              <AnimatedText
+                as="p"
+                className="contact-copy"
+                text="The shop is listed as an auto detailing service, auto repair shop, and repair service at 133 River Dr in Garfield."
+                delay={25}
+              />
               <div className="contact-actions">
-                <a className="button button-primary" href={PHONE_LINK}>
-                  Call {PHONE_DISPLAY}
-                </a>
-                <a
+                <AnimatedText
+                  as="a"
+                  className="button button-primary"
+                  href={PHONE_LINK}
+                  text={`Call ${PHONE_DISPLAY}`}
+                />
+                <AnimatedText
+                  as="a"
                   className="button button-secondary"
                   href={MAPS_URL}
                   target="_blank"
                   rel="noreferrer"
-                >
-                  Open Maps
-                </a>
+                  text="Open Maps"
+                />
               </div>
             </div>
           </div>
@@ -314,27 +511,103 @@ function App() {
 
       <footer className="site-footer">
         <div className="footer-brand">
-          <span>MTR</span>
-          <p>Auto Detail & Auto Care Services</p>
+          <img
+            className="footer-logo"
+            src={asset('footer-logo.png')}
+            alt="MTR"
+          />
+          <AnimatedText as="p" text="Auto Detail & Auto Care Services" />
         </div>
-        <div className="footer-grid">
-          <nav aria-label="Footer links">
-            <a href="#services">Services</a>
-            <a href="#about">About</a>
-            <a href="#visit">Visit Us</a>
-            <a href="#contact">Contact</a>
-          </nav>
-          <p>{ADDRESS}</p>
-          <p>
-            <a href={PHONE_LINK}>{PHONE_DISPLAY}</a> | {HOURS_DISPLAY}
-          </p>
-          <p>
-            No mobile information will be shared with third parties or
-            affiliates for marketing or promotional purposes. Text messaging
-            originator opt-in data and consent will not be shared with any third
-            parties.
-          </p>
+        <div className="footer-table">
+          <section className="footer-field">
+            <AnimatedText
+              as="h2"
+              className="footer-field-title"
+              text="Navigation"
+            />
+            <nav className="footer-nav" aria-label="Footer links">
+              <AnimatedText as="a" href="#services" text="Services" />
+              <AnimatedText as="a" href="#about" text="About" />
+              <AnimatedText as="a" href="#visit" text="Visit Us" />
+              <AnimatedText as="a" href="#contact" text="Contact" />
+            </nav>
+          </section>
+          <section className="footer-field">
+            <AnimatedText
+              as="h2"
+              className="footer-field-title"
+              text="Contact"
+            />
+            <div className="footer-contact-list">
+              <div>
+                <AnimatedText
+                  as="span"
+                  className="footer-contact-label"
+                  text="Address"
+                />
+                <AnimatedText as="p" text={ADDRESS} />
+              </div>
+              <div>
+                <AnimatedText
+                  as="span"
+                  className="footer-contact-label"
+                  text="Phone"
+                />
+                <AnimatedText as="a" href={PHONE_LINK} text={PHONE_DISPLAY} />
+              </div>
+              <div>
+                <AnimatedText
+                  as="span"
+                  className="footer-contact-label"
+                  text="Hours"
+                />
+                <AnimatedText as="p" text={HOURS_DISPLAY} />
+              </div>
+            </div>
+          </section>
+          <section className="footer-field">
+            <AnimatedText
+              as="h2"
+              className="footer-field-title"
+              text="Quick Actions"
+            />
+            <div className="footer-actions">
+              <AnimatedText
+                as="a"
+                className="button button-primary"
+                href={PHONE_LINK}
+                text="Call Now"
+              />
+              <AnimatedText
+                as="a"
+                className="button button-secondary"
+                href={MAPS_URL}
+                target="_blank"
+                rel="noreferrer"
+                text="Get Directions"
+              />
+            </div>
+          </section>
         </div>
+        <AnimatedText
+          as="p"
+          className="footer-privacy"
+          text="No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text messaging originator opt-in data and consent will not be shared with any third parties."
+          delay={20}
+        />
+        <nav className="footer-socials" aria-label="Social media">
+          {SOCIAL_LINKS.map((social) => (
+            <a
+              href={social.link}
+              key={social.label}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`MTR on ${social.label}`}
+            >
+              <SocialIcon name={social.label} />
+            </a>
+          ))}
+        </nav>
       </footer>
 
      
