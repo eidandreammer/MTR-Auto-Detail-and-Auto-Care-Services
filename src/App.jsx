@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import BlurText from './components/BlurText.jsx'
 import StaggeredMenu from './components/StaggeredMenu.jsx'
@@ -134,6 +134,57 @@ function useMediaQuery(query) {
 
 function App() {
   const showMobileMenu = useMediaQuery(MOBILE_MENU_QUERY)
+  const heroRef = useRef(null)
+  const [headerState, setHeaderState] = useState({
+    isScrolled: false,
+    isHidden: false,
+  })
+
+  useEffect(() => {
+    let previousScrollY = window.scrollY
+    let animationFrameId
+
+    const updateHeader = () => {
+      const currentScrollY = Math.max(window.scrollY, 0)
+      const heroBottom = heroRef.current?.getBoundingClientRect().bottom ?? 0
+      const isOutsideHero = heroBottom <= 0
+      const isScrollingDown = currentScrollY > previousScrollY
+      const isScrollingUp = currentScrollY < previousScrollY
+
+      setHeaderState((currentState) => {
+        const nextState = {
+          isScrolled: currentScrollY > 16,
+          isHidden: isOutsideHero
+            ? isScrollingDown || (!isScrollingUp && currentState.isHidden)
+            : false,
+        }
+
+        return nextState.isScrolled === currentState.isScrolled &&
+          nextState.isHidden === currentState.isHidden
+          ? currentState
+          : nextState
+      })
+
+      previousScrollY = currentScrollY
+      animationFrameId = undefined
+    }
+
+    const handleScroll = () => {
+      if (animationFrameId === undefined) {
+        animationFrameId = window.requestAnimationFrame(updateHeader)
+      }
+    }
+
+    updateHeader()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (animationFrameId !== undefined) {
+        window.cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const revealItems = document.querySelectorAll('[data-reveal]')
@@ -201,11 +252,15 @@ function App() {
         <section
           className="hero-section"
           id="home"
+          ref={heroRef}
           style={{
             '--hero-background-image': `url("${asset('MTR hero section.jpg')}")`,
           }}
         >
-          <header className="site-header" aria-label="Primary navigation">
+          <header
+            className={`site-header${headerState.isScrolled ? ' is-scrolled' : ''}${headerState.isHidden ? ' is-hidden' : ''}`}
+            aria-label="Primary navigation"
+          >
             <div className="header-inner">
               <a className="header-brand" href="#home" aria-label="MTR home">
                 <img
@@ -509,85 +564,92 @@ function App() {
 
       </main>
 
-      <footer className="site-footer">
-        <div className="footer-brand">
-          <img
-            className="footer-logo"
-            src={asset('footer-logo.png')}
-            alt="MTR"
-          />
-          <AnimatedText as="p" text="Auto Detail & Auto Care Services" />
-        </div>
-        <div className="footer-table">
-          <section className="footer-field">
-            <AnimatedText
-              as="h2"
-              className="footer-field-title"
-              text="Navigation"
+      <footer
+        className="site-footer"
+        style={{
+          '--footer-background-image': `url("${asset('MTR hero section.jpg')}")`,
+        }}
+      >
+        <div className="footer-main">
+          <div className="footer-brand">
+            <img
+              className="footer-logo"
+              src={asset('footer-logo.png')}
+              alt="MTR"
             />
-            <nav className="footer-nav" aria-label="Footer links">
-              <AnimatedText as="a" href="#services" text="Services" />
-              <AnimatedText as="a" href="#about" text="About" />
-              <AnimatedText as="a" href="#visit" text="Visit Us" />
-              <AnimatedText as="a" href="#contact" text="Contact" />
-            </nav>
-          </section>
-          <section className="footer-field">
-            <AnimatedText
-              as="h2"
-              className="footer-field-title"
-              text="Contact"
-            />
-            <div className="footer-contact-list">
-              <div>
-                <AnimatedText
-                  as="span"
-                  className="footer-contact-label"
-                  text="Address"
-                />
-                <AnimatedText as="p" text={ADDRESS} />
-              </div>
-              <div>
-                <AnimatedText
-                  as="span"
-                  className="footer-contact-label"
-                  text="Phone"
-                />
-                <AnimatedText as="a" href={PHONE_LINK} text={PHONE_DISPLAY} />
-              </div>
-              <div>
-                <AnimatedText
-                  as="span"
-                  className="footer-contact-label"
-                  text="Hours"
-                />
-                <AnimatedText as="p" text={HOURS_DISPLAY} />
-              </div>
-            </div>
-          </section>
-          <section className="footer-field">
-            <AnimatedText
-              as="h2"
-              className="footer-field-title"
-              text="Quick Actions"
-            />
-            <div className="footer-actions">
+            <AnimatedText as="p" text="Auto Detail & Auto Care Services" />
+          </div>
+          <div className="footer-table">
+            <section className="footer-field">
               <AnimatedText
-                as="a"
-                className="button button-primary"
-                href={PHONE_LINK}
-                text="Call Now"
+                as="h2"
+                className="footer-field-title"
+                text="Navigation"
               />
+              <nav className="footer-nav" aria-label="Footer links">
+                <AnimatedText as="a" href="#services" text="Services" />
+                <AnimatedText as="a" href="#about" text="About" />
+                <AnimatedText as="a" href="#visit" text="Visit Us" />
+                <AnimatedText as="a" href="#contact" text="Contact" />
+              </nav>
+            </section>
+            <section className="footer-field">
               <AnimatedText
-                as="a"
-                className="button button-secondary"
-                href={MAPS_URL}
-                target="_blank"
-                rel="noreferrer"
-                text="Get Directions"
+                as="h2"
+                className="footer-field-title"
+                text="Contact"
               />
-            </div>
-          </section>
+              <div className="footer-contact-list">
+                <div>
+                  <AnimatedText
+                    as="span"
+                    className="footer-contact-label"
+                    text="Address"
+                  />
+                  <AnimatedText as="p" text={ADDRESS} />
+                </div>
+                <div>
+                  <AnimatedText
+                    as="span"
+                    className="footer-contact-label"
+                    text="Phone"
+                  />
+                  <AnimatedText as="a" href={PHONE_LINK} text={PHONE_DISPLAY} />
+                </div>
+                <div>
+                  <AnimatedText
+                    as="span"
+                    className="footer-contact-label"
+                    text="Hours"
+                  />
+                  <AnimatedText as="p" text={HOURS_DISPLAY} />
+                </div>
+              </div>
+            </section>
+            <section className="footer-field">
+              <AnimatedText
+                as="h2"
+                className="footer-field-title"
+                text="Quick Actions"
+              />
+              <div className="footer-actions">
+                <AnimatedText
+                  as="a"
+                  className="button button-primary"
+                  href={PHONE_LINK}
+                  text="Call Now"
+                />
+                <AnimatedText
+                  as="a"
+                  className="button button-secondary"
+                  href={MAPS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  text="Get Directions"
+                />
+              </div>
+            </section>
+          </div>
         </div>
         <AnimatedText
           as="p"
