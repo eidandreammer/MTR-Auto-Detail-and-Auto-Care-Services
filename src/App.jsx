@@ -153,7 +153,7 @@ function App() {
 
       setHeaderState((currentState) => {
         const nextState = {
-          isScrolled: currentScrollY > 16,
+          isScrolled: isOutsideHero,
           isHidden: isOutsideHero
             ? isScrollingDown || (!isScrollingUp && currentState.isHidden)
             : false,
