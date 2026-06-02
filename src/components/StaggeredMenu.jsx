@@ -26,8 +26,6 @@ export const StaggeredMenu = ({
   const panelRef = useRef(null)
   const preLayersRef = useRef(null)
   const preLayerElsRef = useRef([])
-  const plusHRef = useRef(null)
-  const plusVRef = useRef(null)
   const iconRef = useRef(null)
   const textInnerRef = useRef(null)
   const [textLines, setTextLines] = useState(['Menu', 'Close'])
@@ -45,11 +43,9 @@ export const StaggeredMenu = ({
     const ctx = gsap.context(() => {
       const panel = panelRef.current
       const preContainer = preLayersRef.current
-      const plusH = plusHRef.current
-      const plusV = plusVRef.current
       const icon = iconRef.current
       const textInner = textInnerRef.current
-      if (!panel || !plusH || !plusV || !icon || !textInner) return
+      if (!panel || !icon || !textInner) return
 
       const preLayers = preContainer
         ? Array.from(preContainer.querySelectorAll('.sm-prelayer'))
@@ -61,8 +57,6 @@ export const StaggeredMenu = ({
       if (preContainer) {
         gsap.set(preContainer, { xPercent: 0, opacity: 1 })
       }
-      gsap.set(plusH, { transformOrigin: '50% 50%', rotate: 0 })
-      gsap.set(plusV, { transformOrigin: '50% 50%', rotate: 90 })
       gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%' })
       gsap.set(textInner, { yPercent: 0 })
       if (toggleBtnRef.current) {
@@ -255,7 +249,7 @@ export const StaggeredMenu = ({
     if (!icon) return
     spinTweenRef.current?.kill()
     spinTweenRef.current = gsap.to(icon, {
-      rotate: opening ? 225 : 0,
+      rotate: opening ? 180 : 0,
       duration: opening ? 0.8 : 0.35,
       ease: opening ? 'power4.out' : 'power3.inOut',
       overwrite: 'auto',
@@ -461,8 +455,8 @@ export const StaggeredMenu = ({
             alt=""
             className="sm-logo-img"
             draggable={false}
-            width={42}
-            height={42}
+            width={1024}
+            height={559}
           />
         </a>
         <button
@@ -474,6 +468,11 @@ export const StaggeredMenu = ({
           onClick={toggleMenu}
           type="button"
         >
+          <span ref={iconRef} className="sm-icon" aria-hidden="true">
+            <span className="sm-icon-line sm-icon-line-top" />
+            <span className="sm-icon-line sm-icon-line-middle" />
+            <span className="sm-icon-line sm-icon-line-bottom" />
+          </span>
           <span className="sm-toggle-textWrap" aria-hidden="true">
             <span ref={textInnerRef} className="sm-toggle-textInner">
               {textLines.map((line, index) => (
@@ -488,10 +487,6 @@ export const StaggeredMenu = ({
                 </span>
               ))}
             </span>
-          </span>
-          <span ref={iconRef} className="sm-icon" aria-hidden="true">
-            <span ref={plusHRef} className="sm-icon-line" />
-            <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
           </span>
         </button>
       </header>

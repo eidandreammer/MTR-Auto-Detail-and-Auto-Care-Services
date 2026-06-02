@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import BlurText from './components/BlurText.jsx'
 import StaggeredMenu from './components/StaggeredMenu.jsx'
@@ -16,7 +16,8 @@ const MAPS_URL =
   'https://www.google.com/maps/place/MTR+Auto+Detail+and+Auto+Care+Services/@40.8640673,-74.107533,17z/data=!3m1!4b1!4m6!3m5!1s0x89c2f91d34b7b6bb:0x27692c57dba7643c!8m2!3d40.8640673!4d-74.107533!16s%2Fg%2F11qnlxn9qt?entry=ttu'
 const MOBILE_MENU_QUERY = '(max-width: 760px)'
 const HEADER_SCROLL_THRESHOLD = 24
-const LOGO_URL = `${import.meta.env.BASE_URL}favicon.ico`
+const HEADER_SCROLL_DIRECTION_THRESHOLD = 6
+const LOGO_URL = `${import.meta.env.BASE_URL}images/Mobile logo.png`
 const SOCIAL_LINKS = [
   { label: 'Instagram', link: 'https://www.instagram.com/' },
   { label: 'Facebook', link: 'https://www.facebook.com/' },
@@ -136,31 +137,64 @@ function useMediaQuery(query) {
 function App() {
   const showMobileMenu = useMediaQuery(MOBILE_MENU_QUERY)
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false)
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true)
+  const heroRef = useRef(null)
 
   useEffect(() => {
     let animationFrameId
+    let lastScrollY = Math.max(window.scrollY, 0)
 
     const updateHeader = () => {
-      setIsHeaderScrolled(window.scrollY > HEADER_SCROLL_THRESHOLD)
+      const scrollY = Math.max(window.scrollY, 0)
+      const hero = heroRef.current
+      const heroBottom = hero
+        ? hero.offsetTop + hero.offsetHeight
+        : window.innerHeight
+      const isOutsideHero = scrollY >= heroBottom
+      const scrollDelta = scrollY - lastScrollY
+
+      setIsHeaderScrolled(scrollY > HEADER_SCROLL_THRESHOLD)
+      setIsHeaderVisible((isVisible) => {
+        if (!isOutsideHero) return true
+        if (scrollDelta > HEADER_SCROLL_DIRECTION_THRESHOLD) return false
+        if (scrollDelta < -HEADER_SCROLL_DIRECTION_THRESHOLD) return true
+        return isVisible
+      })
+
+      if (
+        !isOutsideHero ||
+        Math.abs(scrollDelta) > HEADER_SCROLL_DIRECTION_THRESHOLD
+      ) {
+        lastScrollY = scrollY
+      }
       animationFrameId = undefined
     }
 
-    const handleScroll = () => {
+    const scheduleHeaderUpdate = () => {
       if (animationFrameId === undefined) {
         animationFrameId = window.requestAnimationFrame(updateHeader)
       }
     }
 
     updateHeader()
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('scroll', scheduleHeaderUpdate, { passive: true })
+    window.addEventListener('resize', scheduleHeaderUpdate)
 
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', scheduleHeaderUpdate)
+      window.removeEventListener('resize', scheduleHeaderUpdate)
       if (animationFrameId !== undefined) {
         window.cancelAnimationFrame(animationFrameId)
       }
     }
   }, [])
+
+  const headerClassName = [
+    isHeaderScrolled && 'is-scrolled',
+    !isHeaderVisible && 'is-hidden',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   useEffect(() => {
     const revealItems = document.querySelectorAll('[data-reveal]')
@@ -210,13 +244,13 @@ function App() {
 
       {showMobileMenu && (
         <StaggeredMenu
-          className={isHeaderScrolled ? 'is-scrolled' : undefined}
+          className={headerClassName || undefined}
           position="right"
           items={menuItems}
           displaySocials={false}
           displayItemNumbering
-          menuButtonColor={isHeaderScrolled ? '#1a1a1a' : '#ffffff'}
-          openMenuButtonColor="#1a1a1a"
+          menuButtonColor="#f5f5f5"
+          openMenuButtonColor="#f5f5f5"
           changeMenuColorOnOpen
           colors={['#1a1a1a', '#d5001c']}
           logoUrl={LOGO_URL}
@@ -227,6 +261,7 @@ function App() {
 
       <main>
         <section
+          ref={heroRef}
           className="hero-section"
           id="home"
           style={{
@@ -234,7 +269,7 @@ function App() {
           }}
         >
           <header
-            className={`site-header${isHeaderScrolled ? ' is-scrolled' : ''}`}
+            className={`site-header${headerClassName ? ` ${headerClassName}` : ''}`}
             aria-label="Primary navigation"
           >
             <div className="header-inner">

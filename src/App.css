@@ -34,7 +34,12 @@
   background: transparent;
   transition:
     background 220ms ease,
-    box-shadow 220ms ease;
+    box-shadow 220ms ease,
+    transform 260ms ease;
+}
+
+.site-header.is-hidden {
+  transform: translateY(-100%);
 }
 
 .site-header.is-scrolled {
