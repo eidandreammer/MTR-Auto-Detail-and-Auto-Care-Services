@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import BlurText from './components/BlurText.jsx'
 import StaggeredMenu from './components/StaggeredMenu.jsx'
@@ -15,6 +15,7 @@ const BUSINESS_HOURS = [
 const MAPS_URL =
   'https://www.google.com/maps/place/MTR+Auto+Detail+and+Auto+Care+Services/@40.8640673,-74.107533,17z/data=!3m1!4b1!4m6!3m5!1s0x89c2f91d34b7b6bb:0x27692c57dba7643c!8m2!3d40.8640673!4d-74.107533!16s%2Fg%2F11qnlxn9qt?entry=ttu'
 const MOBILE_MENU_QUERY = '(max-width: 760px)'
+const HEADER_SCROLL_THRESHOLD = 24
 const LOGO_URL = `${import.meta.env.BASE_URL}favicon.ico`
 const SOCIAL_LINKS = [
   { label: 'Instagram', link: 'https://www.instagram.com/' },
@@ -134,38 +135,13 @@ function useMediaQuery(query) {
 
 function App() {
   const showMobileMenu = useMediaQuery(MOBILE_MENU_QUERY)
-  const heroRef = useRef(null)
-  const [headerState, setHeaderState] = useState({
-    isScrolled: false,
-    isHidden: false,
-  })
+  const [isHeaderScrolled, setIsHeaderScrolled] = useState(false)
 
   useEffect(() => {
-    let previousScrollY = window.scrollY
     let animationFrameId
 
     const updateHeader = () => {
-      const currentScrollY = Math.max(window.scrollY, 0)
-      const heroBottom = heroRef.current?.getBoundingClientRect().bottom ?? 0
-      const isOutsideHero = heroBottom <= 0
-      const isScrollingDown = currentScrollY > previousScrollY
-      const isScrollingUp = currentScrollY < previousScrollY
-
-      setHeaderState((currentState) => {
-        const nextState = {
-          isScrolled: isOutsideHero,
-          isHidden: isOutsideHero
-            ? isScrollingDown || (!isScrollingUp && currentState.isHidden)
-            : false,
-        }
-
-        return nextState.isScrolled === currentState.isScrolled &&
-          nextState.isHidden === currentState.isHidden
-          ? currentState
-          : nextState
-      })
-
-      previousScrollY = currentScrollY
+      setIsHeaderScrolled(window.scrollY > HEADER_SCROLL_THRESHOLD)
       animationFrameId = undefined
     }
 
@@ -234,11 +210,12 @@ function App() {
 
       {showMobileMenu && (
         <StaggeredMenu
+          className={isHeaderScrolled ? 'is-scrolled' : undefined}
           position="right"
           items={menuItems}
           displaySocials={false}
           displayItemNumbering
-          menuButtonColor="#1a1a1a"
+          menuButtonColor={isHeaderScrolled ? '#1a1a1a' : '#ffffff'}
           openMenuButtonColor="#1a1a1a"
           changeMenuColorOnOpen
           colors={['#1a1a1a', '#d5001c']}
@@ -252,13 +229,12 @@ function App() {
         <section
           className="hero-section"
           id="home"
-          ref={heroRef}
           style={{
             '--hero-background-image': `url("${asset('MTR hero section.jpg')}")`,
           }}
         >
           <header
-            className={`site-header${headerState.isScrolled ? ' is-scrolled' : ''}${headerState.isHidden ? ' is-hidden' : ''}`}
+            className={`site-header${isHeaderScrolled ? ' is-scrolled' : ''}`}
             aria-label="Primary navigation"
           >
             <div className="header-inner">

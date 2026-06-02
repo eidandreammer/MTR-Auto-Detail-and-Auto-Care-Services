@@ -27,6 +27,14 @@
   padding: 18px;
   background: transparent;
   pointer-events: none;
+  transition:
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.staggered-menu-wrapper.is-scrolled .staggered-menu-header {
+  background: #ffffff;
+  box-shadow: 0 12px 34px rgba(18, 25, 33, 0.12);
 }
 
 .staggered-menu-header > * {
